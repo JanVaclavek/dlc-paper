@@ -140,8 +140,16 @@ section > .ltx_title + .ltx_date + .ltx_para > .ltx_p,
 
 .ltx_caption {
     font-size: 0.9em;
-    margin-top: 1.5em !important; /* Increase and force space between figure and caption */
+    margin-top: 1.5em !important; /* Default for Fig 1 & 2 */
     color: #444;
+}
+
+/* Decrease spacing for figures with larger diagrams */
+#Sx2\.F2 .ltx_caption,
+#Sx3\.F3 .ltx_caption,
+#Sx5\.F4 .ltx_caption,
+#Sx5\.F5 .ltx_caption {
+    margin-top: 0.5em !important;
 }
 
 .ltx_tag_figure {
