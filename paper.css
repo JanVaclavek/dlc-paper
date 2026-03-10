@@ -132,7 +132,10 @@ section > .ltx_title + .ltx_date + .ltx_para > .ltx_p,
 .ltx_figure {
     margin: 2em auto;
     background-color: white !important;
+    color: black !important; /* Ensure caption/tags stay black */
     padding: 1em;
+    color-scheme: light !important; /* Tell browser this is a light-only block */
+    filter: none !important; /* Disable any automatic dark mode inversion filters */
 }
 
 .ltx_caption {
