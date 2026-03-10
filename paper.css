@@ -140,7 +140,7 @@ section > .ltx_title + .ltx_date + .ltx_para > .ltx_p,
 
 .ltx_caption {
     font-size: 0.9em;
-    margin-top: 0.5em;
+    margin-top: 1.5em !important; /* Increase and force space between figure and caption */
     color: #444;
 }
 
