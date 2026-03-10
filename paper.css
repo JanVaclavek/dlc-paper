@@ -131,6 +131,8 @@ section > .ltx_title + .ltx_date + .ltx_para > .ltx_p,
 /* Figures and Captions */
 .ltx_figure {
     margin: 2em auto;
+    background-color: white !important;
+    padding: 1em;
 }
 
 .ltx_caption {
@@ -146,7 +148,6 @@ section > .ltx_title + .ltx_date + .ltx_para > .ltx_p,
 .ltx_graphics {
     max-width: 100%;
     height: auto;
-    background-color: white; /* Ensure visibility in dark mode */
 }
 
 /* Bibliography */
