@@ -1,13 +1,9 @@
-
-
 <!DOCTYPE html><html>
 <head>
-<script defer src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-chtml.js">
-</script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-chtml.js"></script>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>Demystifying Discreet Log Contracts (DLCs)</title>
-<!--Generated on Sat Mar  7 13:35:20 2026 by LaTeXML (version 0.8.6) http://dlmf.nist.gov/LaTeXML/.-->
-<!--Document created on .-->
+
 
 <link rel="stylesheet" href="LaTeXML.css" type="text/css">
 <link rel="stylesheet" href="ltx-article.css" type="text/css">
@@ -81,74 +77,335 @@ The oracle cannot attest to two different outcomes of one event without compromi
 </div>
 </section>
 <section id="Sx1.SS0.SSSx2" class="ltx_subsubsection">
-<h3 class="ltx_title ltx_title_subsubsection">Anticipation points and attestations</h3>
+<h3 class="ltx_title ltx_title_subsubsection">DLCs lifecycle</h3>
 
 <div id="Sx1.SS0.SSSx2.p1" class="ltx_para">
-<p class="ltx_p">The event’s public key, sometimes also called a <em class="ltx_emph ltx_font_italic">nonce</em>, is a point <math id="Sx1.SS0.SSSx2.p1.m1" class="ltx_Math" alttext="R:=rG" display="inline"><mrow><mi>R</mi><mo>:=</mo><mrow><mi>r</mi><mo>⁢</mo><mi>G</mi></mrow></mrow></math>, where <math id="Sx1.SS0.SSSx2.p1.m2" class="ltx_Math" alttext="r" display="inline"><mi>r</mi></math> is the event’s secret key.
-Similarly, the oracle’s public key is a point <math id="Sx1.SS0.SSSx2.p1.m3" class="ltx_Math" alttext="P:=pG" display="inline"><mrow><mi>P</mi><mo>:=</mo><mrow><mi>p</mi><mo>⁢</mo><mi>G</mi></mrow></mrow></math>, where <math id="Sx1.SS0.SSSx2.p1.m4" class="ltx_Math" alttext="p" display="inline"><mi>p</mi></math> is the oracle’s secret key.
-</p>
+<p class="ltx_p">At a high level, the whole process works as follows:</p>
 </div>
+<figure id="Sx1.F1" class="ltx_figure"><object type="image/svg+xml" data="CETs.svg" id="Sx1.F1.g1" class="ltx_graphics ltx_centering" width="460" height="723" aria-label="Visualization of CETs after contract setup and after attestation for a simple contract between Alice and Bob consisting only of two CETs. Solid lines correspond to on-chain transactions, and dashed lines to off-chain transactions."><p>Visualization of CETs after contract setup and after attestation for a simple contract between Alice and Bob consisting only of two CETs. Solid lines correspond to on-chain transactions, and dashed lines to off-chain transactions.</p></object>
+<figcaption class="ltx_caption ltx_centering"><span class="ltx_tag ltx_tag_figure">Figure 1: </span>Visualization of CETs after contract setup and after attestation for a simple contract between Alice and Bob consisting only of two CETs. Solid lines correspond to on-chain transactions, and dashed lines to off-chain transactions.</figcaption>
+</figure>
 <div id="Sx1.SS0.SSSx2.p2" class="ltx_para">
-<p class="ltx_p">Therefore, for a given event, the event’s public key <math id="Sx1.SS0.SSSx2.p2.m1" class="ltx_Math" alttext="R" display="inline"><mi>R</mi></math> and the oracle’s public key <math id="Sx1.SS0.SSSx2.p2.m2" class="ltx_Math" alttext="P" display="inline"><mi>P</mi></math> are available to compute the anticipation points.
-The secret keys <math id="Sx1.SS0.SSSx2.p2.m3" class="ltx_Math" alttext="r" display="inline"><mi>r</mi></math> and <math id="Sx1.SS0.SSSx2.p2.m4" class="ltx_Math" alttext="p" display="inline"><mi>p</mi></math> are known only to the oracle and the oracle will use them later to compute the attestation when the event occurs.</p>
+<dl id="Sx1.I2" class="ltx_description">
+<dt id="Sx1.I2.ix1" class="ltx_item"><span class="ltx_tag ltx_tag_item"><span class="ltx_text ltx_font_bold">1) Oracle announcement:</span></span></dt>
+<dd class="ltx_item">
+<div id="Sx1.I2.ix1.p1" class="ltx_para">
+<p class="ltx_p">The oracle first defines an event, including the date of the event, its possible outcomes, and the event’s public key.
+As mentioned above, oracles are off-chain, so an oracle may publish this information, for instance, on its website.
+In addition to the event’s public key, which must be unique for each event, there is
+also the oracle’s public key that can be reused across multiple events.
+The definition of an event is called an <em class="ltx_emph ltx_font_italic">oracle announcement</em>.</p>
+</div>
+</dd>
+<dt id="Sx1.I2.ix2" class="ltx_item"><span class="ltx_tag ltx_tag_item"><span class="ltx_text ltx_font_bold">2) Funding the contract:</span></span></dt>
+<dd class="ltx_item">
+<div id="Sx1.I2.ix2.p1" class="ltx_para">
+<p class="ltx_p">Then, anyone can condition a Bitcoin payment on an outcome of this event.
+Typically, two parties (Alice and Bob) first lock their Bitcoin into a 2-of-2 multisig address, each party holding one key, ensuring that (i) anyone cannot back out of the contract once it has been set up and (ii) Bitcoin cannot be stolen by any single party.
+The transaction locking Bitcoin in this 2-of-2 multisig address is called a <em class="ltx_emph ltx_font_italic">funding transaction</em>.</p>
+</div>
+</dd>
+<dt id="Sx1.I2.ix3" class="ltx_item"><span class="ltx_tag ltx_tag_item"><span class="ltx_text ltx_font_bold">3) Contract Execution Transactions:</span></span></dt>
+<dd class="ltx_item">
+<div id="Sx1.I2.ix3.p1" class="ltx_para">
+<p class="ltx_p">For each possible outcome of the event, using the event’s and oracle’s public keys, Alice and Bob compute a special value called an <em class="ltx_emph ltx_font_italic">anticipation point</em> (sometimes also called a <em class="ltx_emph ltx_font_italic">signature point</em>).
+These anticipation points are then used to construct special Bitcoin transactions, called <em class="ltx_emph ltx_font_italic">Contract Execution Transactions</em> (CETs), spending Bitcoin from the 2-of-2 multisig address to Alice and Bob in an agreed-upon way, according to the event’s outcome.
+So, each CET corresponds, through the anticipation point, to one possible outcome of the event.</p>
+</div>
+<div id="Sx1.I2.ix3.p2" class="ltx_para">
+<p class="ltx_p">The specialty of CETs is that they are not valid transactions yet—a given transaction will only be valid if the oracle confirms the outcome corresponding to this particular transaction.
+At the end, unless the oracle misbehaves, only one CET will be a valid transaction and will close the contract.</p>
+</div>
+</dd>
+<dt id="Sx1.I2.ix4" class="ltx_item"><span class="ltx_tag ltx_tag_item"><span class="ltx_text ltx_font_bold">4) Oracle attestation:</span></span></dt>
+<dd class="ltx_item">
+<div id="Sx1.I2.ix4.p1" class="ltx_para">
+<p class="ltx_p">When an event happens, the oracle determines its outcome and confirms this outcome using the oracle’s and event’s secret keys, known only to the oracle.
+The oracle publishes the confirmation, called <em class="ltx_emph ltx_font_italic">oracle attestation</em>, and Alice and Bob can use it to "unlock" precisely one CET to close the contract.</p>
+</div>
+</dd>
+</dl>
 </div>
 <div id="Sx1.SS0.SSSx2.p3" class="ltx_para">
-<p class="ltx_p">For outcome <math id="Sx1.SS0.SSSx2.p3.m1" class="ltx_Math" alttext="o" display="inline"><mi>o</mi></math>, the anticipation point <math id="Sx1.SS0.SSSx2.p3.m2" class="ltx_Math" alttext="T_{o}" display="inline"><msub><mi>T</mi><mi>o</mi></msub></math> is computed as</p>
+<p class="ltx_p">The funding transaction and Contract Execution Transactions (CETs) are visualized in <a href="#Sx1.F1" title="Figure 1 ‣ DLCs lifecycle ‣ Introduction ‣ Demystifying Discreet Log Contracts (DLCs)" class="ltx_ref"><span class="ltx_text ltx_ref_tag">1</span></a>.</p>
 </div>
-<div id="Sx1.SS0.SSSx2.p4" class="ltx_para">
-<table id="Sx1.E1" class="ltx_equation ltx_eqn_table">
+</section>
+<section id="Sx1.SS0.SSSx3" class="ltx_subsubsection">
+<h3 class="ltx_title ltx_title_subsubsection">Evolution of DLCs</h3>
+
+<div id="Sx1.SS0.SSSx3.p1" class="ltx_para">
+<p class="ltx_p">In Dryja’s original proposal from 2017, anticipation points were applied directly in the CETs locking scripts together with timelocks.
+The construction worked but introduced an asymmetry in CETs held by Alice and Bob and required two transactions to close the contract unilaterally.</p>
+</div>
+<div id="Sx1.SS0.SSSx3.p2" class="ltx_para">
+<p class="ltx_p">The current DLC specification <cite class="ltx_cite ltx_citemacro_cite">[<a href="#bib.bib3" title="Dlc-specs" class="ltx_ref">7</a>]</cite> and implementation <cite class="ltx_cite ltx_citemacro_cite">[<a href="#bib.bib2" title="Rust-dlc" class="ltx_ref">5</a>]</cite> moved from the original proposal and removed the above-mentioned asymmetry by making use of adaptor signatures, as suggested by Fournier <cite class="ltx_cite ltx_citemacro_cite">[<a href="#bib.bib6" title="One-time verifiably encrypted signatures a.k.a. adaptor signatures" class="ltx_ref">FOU19</a>]</cite> and extended by Le Guilly et al <cite class="ltx_cite ltx_citemacro_cite">[<a href="#bib.bib5" title="Bitcoin oracle contracts: discreet log contracts in practice" class="ltx_ref">GKK22</a>]</cite>.
+We focus on the current variant using adaptor signatures.
+Before deep diving into the construction of DLCs, we show how adaptor signatures work.</p>
+</div>
+</section>
+</section>
+<section id="Sx2" class="ltx_section">
+<h2 class="ltx_title ltx_title_section">Adaptor signatures</h2>
+
+<div id="Sx2.p1" class="ltx_para">
+<p class="ltx_p">Adaptor signatures, popularized by Poelstra as a way to execute scriptless scripts <cite class="ltx_cite ltx_citemacro_cite">[<a href="#bib.bib4" title="Scriptless scripts" class="ltx_ref">POE17</a>]</cite>, are a specific application of verifiably encrypted signatures <cite class="ltx_cite ltx_citemacro_cite">[<a href="#bib.bib1" title="Aggregate and verifiably encrypted signatures from bilinear maps" class="ltx_ref">BGL+03</a>]</cite>.
+They allow us to create so-called pre-signatures (sometimes also called adaptor signatures) instead of signatures.
+The pre-signature is not a valid signature on a message—it can rather be seen as an encryption of a valid signature.
+Now you may ask, encryption using what? Apart from a secret key and a message, a pre-signature is created using a so-called <em class="ltx_emph ltx_font_italic">adaptor point</em>.
+The adaptor point can therefore be seen as a public encryption key.</p>
+</div>
+<div id="Sx2.p2" class="ltx_para">
+<p class="ltx_p">One can transform (or adapt, as the name suggests) a pre-signature into a valid signature only with knowledge of a so-called <em class="ltx_emph ltx_font_italic">adaptor secret</em> corresponding to the adaptor point used to create the pre-signature.
+The secret key is not necessary for this transformation.
+An adaptor point <math id="Sx2.p2.m1" class="ltx_Math" alttext="Y" display="inline"><mi>Y</mi></math> is an elliptic curve point, and the underlying adaptor secret <math id="Sx2.p2.m2" class="ltx_Math" alttext="y" display="inline"><mi>y</mi></math> is its discrete logarithm, i.e., <math id="Sx2.p2.m3" class="ltx_Math" alttext="y" display="inline"><mi>y</mi></math> such that <math id="Sx2.p2.m4" class="ltx_Math" alttext="Y=yG" display="inline"><mrow><mi>Y</mi><mo>=</mo><mrow><mi>y</mi><mo>⁢</mo><mi>G</mi></mrow></mrow></math>, where <math id="Sx2.p2.m5" class="ltx_Math" alttext="G" display="inline"><mi>G</mi></math> is the group generator.
+A pre-signature and its transformation into a valid signature are visualized in <a href="#Sx2.F2" title="Figure 2 ‣ Adaptor signatures ‣ Demystifying Discreet Log Contracts (DLCs)" class="ltx_ref"><span class="ltx_text ltx_ref_tag">2</span></a></p>
+</div>
+<figure id="Sx2.F2" class="ltx_figure"><object type="image/svg+xml" data="adaptor_signature.svg" id="Sx2.F2.g1" class="ltx_graphics ltx_centering" width="541" height="213" aria-label="Visualization of a pre-signature and its transformation into a valid signature."><p>Visualization of a pre-signature and its transformation into a valid signature.</p></object>
+<p class="ltx_p ltx_align_center">.</p>
+<figcaption class="ltx_caption ltx_centering"><span class="ltx_tag ltx_tag_figure">Figure 2: </span>Visualization of a pre-signature and its transformation into a valid signature.</figcaption>
+</figure>
+<div id="Sx2.p3" class="ltx_para">
+<p class="ltx_p">It is also possible to verify that a pre-signature can be transformed into a valid signature once the adaptor secret corresponding to the adaptor point is revealed.
+This property will be crucial in the construction of oracles using adaptor signatures.</p>
+</div>
+<div id="Sx2.p4" class="ltx_para">
+<p class="ltx_p">Adaptor signatures can be constructed for both signature schemes used in Bitcoin—Schnorr signatures and ECDSA.
+The construction for Schnorr signatures is more straightforward and is shown in the last <a href="#Sx5.SS0.SSSx1" title="Schnorr signature scheme ‣ Schnorr signatures ‣ Demystifying Discreet Log Contracts (DLCs)" class="ltx_ref">section</a>.</p>
+</div>
+<section id="Sx2.SS0.SSSx3.Px1" class="ltx_paragraph">
+<h4 class="ltx_title ltx_title_paragraph">Linearity of adaptor points and adaptor secrets.</h4>
+
+<div id="Sx2.SS0.SSSx3.Px1.p1" class="ltx_para">
+<p class="ltx_p">Notice that due to its simple structure, adaptor points and adaptor secrets have a very useful property—linearity.
+Concretely, consider two adaptor points, <math id="Sx2.SS0.SSSx3.Px1.p1.m1" class="ltx_Math" alttext="Y_{1}=y_{1}G" display="inline"><mrow><msub><mi>Y</mi><mn>1</mn></msub><mo>=</mo><mrow><msub><mi>y</mi><mn>1</mn></msub><mo>⁢</mo><mi>G</mi></mrow></mrow></math> and <math id="Sx2.SS0.SSSx3.Px1.p1.m2" class="ltx_Math" alttext="Y_{2}=y_{2}G" display="inline"><mrow><msub><mi>Y</mi><mn>2</mn></msub><mo>=</mo><mrow><msub><mi>y</mi><mn>2</mn></msub><mo>⁢</mo><mi>G</mi></mrow></mrow></math>, with adaptor secrets <math id="Sx2.SS0.SSSx3.Px1.p1.m3" class="ltx_Math" alttext="y_{1}" display="inline"><msub><mi>y</mi><mn>1</mn></msub></math> and <math id="Sx2.SS0.SSSx3.Px1.p1.m4" class="ltx_Math" alttext="y_{2}" display="inline"><msub><mi>y</mi><mn>2</mn></msub></math>, respectively.
+Then, <math id="Sx2.SS0.SSSx3.Px1.p1.m5" class="ltx_Math" alttext="y=y_{1}+y_{2}" display="inline"><mrow><mi>y</mi><mo>=</mo><mrow><msub><mi>y</mi><mn>1</mn></msub><mo>+</mo><msub><mi>y</mi><mn>2</mn></msub></mrow></mrow></math> works as an adaptor secret for an adaptor point <math id="Sx2.SS0.SSSx3.Px1.p1.m6" class="ltx_Math" alttext="Y=Y_{1}+Y_{2}" display="inline"><mrow><mi>Y</mi><mo>=</mo><mrow><msub><mi>Y</mi><mn>1</mn></msub><mo>+</mo><msub><mi>Y</mi><mn>2</mn></msub></mrow></mrow></math>.
+This property will play a crucial role later in the multiple oracle setup and numerical optimizations.</p>
+</div>
+</section>
+</section>
+<section id="Sx3" class="ltx_section">
+<h2 class="ltx_title ltx_title_section">Construction of DLCs</h2>
+
+<div id="Sx3.p1" class="ltx_para">
+<p class="ltx_p">Now, we show how to construct DLCs using adaptor signatures.
+We stick with the example of Alice and Bob.
+The idea is fairly straightforward.
+Alice and Bob lock Bitcoin to the 2-of-2 multisig address via the funding transaction, compute the anticipation points corresponding to possible outcomes, and prepare the CETs.
+Then, instead of signing the CETs, Alice and Bob create pre-signatures on the CETs using anticipation points as adaptor points.</p>
+</div>
+<div id="Sx3.p2" class="ltx_para">
+<p class="ltx_p">Then Alice sends her pre-signatures to Bob and vice versa.
+They verify that the pre-signatures are valid.
+Later, when an event happens, the oracle’s attestation is interpreted as an adaptor secret and is used to adapt Alice’s or Bob’s pre-signature into a valid signature for the CET corresponding to the event’s actual outcome.
+Either Alice adapts Bob’s pre-signature, adds her own signature, and broadcasts the CET, or vice versa.
+Note that the resulting CET is the same, no matter whether Alice or Bob finalizes and broadcasts the transaction.</p>
+</div>
+<div id="Sx3.p3" class="ltx_para">
+<p class="ltx_p">The missing piece in the puzzle is how to compute anticipation points from the oracle’s and event’s public keys, so that (i) anticipation points can be used as adaptor points, and (ii) later attestations can be used as underlying adaptor secrets.</p>
+</div>
+<section id="Sx3.SS0.SSSx1" class="ltx_subsubsection">
+<h3 class="ltx_title ltx_title_subsubsection">Anticipation points and attestations</h3>
+
+<div id="Sx3.SS0.SSSx1.p1" class="ltx_para">
+<p class="ltx_p">The event’s public key, sometimes also called a <em class="ltx_emph ltx_font_italic">nonce</em>, is a point <math id="Sx3.SS0.SSSx1.p1.m1" class="ltx_Math" alttext="R:=rG" display="inline"><mrow><mi>R</mi><mo>:=</mo><mrow><mi>r</mi><mo>⁢</mo><mi>G</mi></mrow></mrow></math>, where <math id="Sx3.SS0.SSSx1.p1.m2" class="ltx_Math" alttext="r" display="inline"><mi>r</mi></math> is the event’s secret key.
+Similarly, the oracle’s public key is a point <math id="Sx3.SS0.SSSx1.p1.m3" class="ltx_Math" alttext="P:=pG" display="inline"><mrow><mi>P</mi><mo>:=</mo><mrow><mi>p</mi><mo>⁢</mo><mi>G</mi></mrow></mrow></math>, where <math id="Sx3.SS0.SSSx1.p1.m4" class="ltx_Math" alttext="p" display="inline"><mi>p</mi></math> is the oracle’s secret key.</p>
+</div>
+<div id="Sx3.SS0.SSSx1.p2" class="ltx_para">
+<p class="ltx_p">Therefore, for a given event, the event’s public key <math id="Sx3.SS0.SSSx1.p2.m1" class="ltx_Math" alttext="R" display="inline"><mi>R</mi></math> and the oracle’s public key <math id="Sx3.SS0.SSSx1.p2.m2" class="ltx_Math" alttext="P" display="inline"><mi>P</mi></math> are available to compute the anticipation points.
+The secret keys <math id="Sx3.SS0.SSSx1.p2.m3" class="ltx_Math" alttext="r" display="inline"><mi>r</mi></math> and <math id="Sx3.SS0.SSSx1.p2.m4" class="ltx_Math" alttext="p" display="inline"><mi>p</mi></math> are known only to the oracle and the oracle will use them later to compute the attestation when the event occurs.</p>
+</div>
+<div id="Sx3.SS0.SSSx1.p3" class="ltx_para">
+<p class="ltx_p">For outcome <math id="Sx3.SS0.SSSx1.p3.m1" class="ltx_Math" alttext="o" display="inline"><mi>o</mi></math>, the anticipation point <math id="Sx3.SS0.SSSx1.p3.m2" class="ltx_Math" alttext="T_{o}" display="inline"><msub><mi>T</mi><mi>o</mi></msub></math> is computed as
+</p>
+</div>
+<div id="Sx3.SS0.SSSx1.p4" class="ltx_para">
+<table id="Sx3.E1" class="ltx_equation ltx_eqn_table">
 
 <tr class="ltx_equation ltx_eqn_row ltx_align_baseline">
 <td class="ltx_eqn_cell ltx_eqn_center_padleft"></td>
-<td class="ltx_eqn_cell ltx_align_center"><math id="Sx1.E1.m1" class="ltx_Math" alttext="T_{o}=R+P\cdot\mathsf{H}(P\parallel R\parallel o)," display="block"><mrow><mrow><msub><mi>T</mi><mi>o</mi></msub><mo>=</mo><mrow><mi>R</mi><mo>+</mo><mrow><mrow><mi>P</mi><mo>⋅</mo><mi>𝖧</mi></mrow><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mrow><mi>P</mi><mo>⁢</mo><mrow><mo>∥</mo><mi>R</mi><mo>∥</mo></mrow><mo>⁢</mo><mi>o</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow><mo>,</mo></mrow></math></td>
+<td class="ltx_eqn_cell ltx_align_center"><math id="Sx3.E1.m1" class="ltx_Math" alttext="T_{o}=R+P\cdot\mathsf{H}(P\parallel R\parallel o)," display="block"><mrow><mrow><msub><mi>T</mi><mi>o</mi></msub><mo>=</mo><mrow><mi>R</mi><mo>+</mo><mrow><mrow><mi>P</mi><mo>⋅</mo><mi>𝖧</mi></mrow><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mrow><mi>P</mi><mo>⁢</mo><mrow><mo>∥</mo><mi>R</mi><mo>∥</mo></mrow><mo>⁢</mo><mi>o</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow><mo>,</mo></mrow></math></td>
 <td class="ltx_eqn_cell ltx_eqn_center_padright"></td>
 <td rowspan="1" class="ltx_eqn_cell ltx_eqn_eqno ltx_align_middle ltx_align_right"><span class="ltx_tag ltx_tag_equation ltx_align_right">(1)</span></td>
 </tr>
 </table>
 </div>
-<div id="Sx1.SS0.SSSx2.p5" class="ltx_para">
-<p class="ltx_p">where <math id="Sx1.SS0.SSSx2.p5.m1" class="ltx_Math" alttext="\mathsf{H}" display="inline"><mi>𝖧</mi></math> is a hash function.
-When the event occurs with the actual outcome <math id="Sx1.SS0.SSSx2.p5.m2" class="ltx_Math" alttext="o^{*}" display="inline"><msup><mi>o</mi><mo>*</mo></msup></math>, the oracle publishes its attestation <math id="Sx1.SS0.SSSx2.p5.m3" class="ltx_Math" alttext="t_{o^{*}}" display="inline"><msub><mi>t</mi><msup><mi>o</mi><mo>*</mo></msup></msub></math> computed as</p>
+<div id="Sx3.SS0.SSSx1.p5" class="ltx_para">
+<p class="ltx_p">where <math id="Sx3.SS0.SSSx1.p5.m1" class="ltx_Math" alttext="\mathsf{H}" display="inline"><mi>𝖧</mi></math> is a hash function.
+When the event occurs with the actual outcome <math id="Sx3.SS0.SSSx1.p5.m2" class="ltx_Math" alttext="o^{*}" display="inline"><msup><mi>o</mi><mo>*</mo></msup></math>, the oracle publishes its attestation <math id="Sx3.SS0.SSSx1.p5.m3" class="ltx_Math" alttext="t_{o^{*}}" display="inline"><msub><mi>t</mi><msup><mi>o</mi><mo>*</mo></msup></msub></math> computed as</p>
 </div>
-<div id="Sx1.SS0.SSSx2.p6" class="ltx_para">
-<table id="Sx1.E2" class="ltx_equation ltx_eqn_table">
+<div id="Sx3.SS0.SSSx1.p6" class="ltx_para">
+<table id="Sx3.E2" class="ltx_equation ltx_eqn_table">
 
 <tr class="ltx_equation ltx_eqn_row ltx_align_baseline">
 <td class="ltx_eqn_cell ltx_eqn_center_padleft"></td>
-<td class="ltx_eqn_cell ltx_align_center"><math id="Sx1.E2.m1" class="ltx_Math" alttext="t_{o^{*}}=r+p\cdot\mathsf{H}(P\parallel R\parallel o^{*})," display="block"><mrow><mrow><msub><mi>t</mi><msup><mi>o</mi><mo>*</mo></msup></msub><mo>=</mo><mrow><mi>r</mi><mo>+</mo><mrow><mrow><mi>p</mi><mo>⋅</mo><mi>𝖧</mi></mrow><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mrow><mi>P</mi><mo>⁢</mo><mrow><mo>∥</mo><mi>R</mi><mo>∥</mo></mrow><mo>⁢</mo><msup><mi>o</mi><mo>*</mo></msup></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow><mo>,</mo></mrow></math></td>
+<td class="ltx_eqn_cell ltx_align_center"><math id="Sx3.E2.m1" class="ltx_Math" alttext="t_{o^{*}}=r+p\cdot\mathsf{H}(P\parallel R\parallel o^{*})," display="block"><mrow><mrow><msub><mi>t</mi><msup><mi>o</mi><mo>*</mo></msup></msub><mo>=</mo><mrow><mi>r</mi><mo>+</mo><mrow><mrow><mi>p</mi><mo>⋅</mo><mi>𝖧</mi></mrow><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mrow><mi>P</mi><mo>⁢</mo><mrow><mo>∥</mo><mi>R</mi><mo>∥</mo></mrow><mo>⁢</mo><msup><mi>o</mi><mo>*</mo></msup></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow><mo>,</mo></mrow></math></td>
 <td class="ltx_eqn_cell ltx_eqn_center_padright"></td>
 <td rowspan="1" class="ltx_eqn_cell ltx_eqn_eqno ltx_align_middle ltx_align_right"><span class="ltx_tag ltx_tag_equation ltx_align_right">(2)</span></td>
 </tr>
 </table>
 </div>
-<div id="Sx1.SS0.SSSx2.p7" class="ltx_para">
-<p class="ltx_p">which is used as an adaptor secret by the contracting parties to adapt the pre-signature into a valid signature for the contract execution transaction <math id="Sx1.SS0.SSSx2.p7.m1" class="ltx_Math" alttext="tx_{o^{*}}" display="inline"><mrow><mi>t</mi><mo>⁢</mo><msub><mi>x</mi><msup><mi>o</mi><mo>*</mo></msup></msub></mrow></math> corresponding to the actual outcome <math id="Sx1.SS0.SSSx2.p7.m2" class="ltx_Math" alttext="o^{*}" display="inline"><msup><mi>o</mi><mo>*</mo></msup></math>.</p>
+<div id="Sx3.SS0.SSSx1.p7" class="ltx_para">
+<p class="ltx_p">which is used as an adaptor secret by the contracting parties to adapt the pre-signature into a valid signature for the contract execution transaction <math id="Sx3.SS0.SSSx1.p7.m1" class="ltx_Math" alttext="tx_{o^{*}}" display="inline"><mrow><mi>t</mi><mo>⁢</mo><msub><mi>x</mi><msup><mi>o</mi><mo>*</mo></msup></msub></mrow></math> corresponding to the actual outcome <math id="Sx3.SS0.SSSx1.p7.m2" class="ltx_Math" alttext="o^{*}" display="inline"><msup><mi>o</mi><mo>*</mo></msup></math>.</p>
 </div>
-<div id="Sx1.SS0.SSSx2.p8" class="ltx_para">
-<p class="ltx_p">From (<a href="#Sx1.E1" title="(1) ‣ Anticipation points and attestations ‣ Introduction ‣ Demystifying Discreet Log Contracts (DLCs)" class="ltx_ref"><span class="ltx_text ltx_ref_tag">1</span></a>) and (<a href="#Sx1.E2" title="(2) ‣ Anticipation points and attestations ‣ Introduction ‣ Demystifying Discreet Log Contracts (DLCs)" class="ltx_ref"><span class="ltx_text ltx_ref_tag">2</span></a>), it is easy to verify that <math id="Sx1.SS0.SSSx2.p8.m1" class="ltx_Math" alttext="t_{o^{*}}\cdot G=T_{o^{*}}" display="inline"><mrow><mrow><msub><mi>t</mi><msup><mi>o</mi><mo>*</mo></msup></msub><mo>⋅</mo><mi>G</mi></mrow><mo>=</mo><msub><mi>T</mi><msup><mi>o</mi><mo>*</mo></msup></msub></mrow></math>, meaning that the attestation <math id="Sx1.SS0.SSSx2.p8.m2" class="ltx_Math" alttext="t_{o^{*}}" display="inline"><msub><mi>t</mi><msup><mi>o</mi><mo>*</mo></msup></msub></math> really works as an adaptor secret for the anticipation point <math id="Sx1.SS0.SSSx2.p8.m3" class="ltx_Math" alttext="T_{o^{*}}" display="inline"><msub><mi>T</mi><msup><mi>o</mi><mo>*</mo></msup></msub></math> being the corresponding adaptor point.</p>
+<div id="Sx3.SS0.SSSx1.p8" class="ltx_para">
+<p class="ltx_p">From (<a href="#Sx3.E1" title="(1) ‣ Anticipation points and attestations ‣ Construction of DLCs ‣ Demystifying Discreet Log Contracts (DLCs)" class="ltx_ref"><span class="ltx_text ltx_ref_tag">1</span></a>) and (<a href="#Sx3.E2" title="(2) ‣ Anticipation points and attestations ‣ Construction of DLCs ‣ Demystifying Discreet Log Contracts (DLCs)" class="ltx_ref"><span class="ltx_text ltx_ref_tag">2</span></a>), it is easy to verify that <math id="Sx3.SS0.SSSx1.p8.m1" class="ltx_Math" alttext="t_{o^{*}}\cdot G=T_{o^{*}}" display="inline"><mrow><mrow><msub><mi>t</mi><msup><mi>o</mi><mo>*</mo></msup></msub><mo>⋅</mo><mi>G</mi></mrow><mo>=</mo><msub><mi>T</mi><msup><mi>o</mi><mo>*</mo></msup></msub></mrow></math>, meaning that the attestation <math id="Sx3.SS0.SSSx1.p8.m2" class="ltx_Math" alttext="t_{o^{*}}" display="inline"><msub><mi>t</mi><msup><mi>o</mi><mo>*</mo></msup></msub></math> really works as an adaptor secret for the anticipation point <math id="Sx3.SS0.SSSx1.p8.m3" class="ltx_Math" alttext="T_{o^{*}}" display="inline"><msub><mi>T</mi><msup><mi>o</mi><mo>*</mo></msup></msub></math> being the corresponding adaptor point.</p>
 </div>
 </section>
-<section id="Sx1.SS0.SSSx3" class="ltx_subsubsection">
+<section id="Sx3.SS0.SSSx2" class="ltx_subsubsection">
 <h3 class="ltx_title ltx_title_subsubsection">Summary</h3>
 
-<div id="Sx1.SS0.SSSx3.p1" class="ltx_para">
-<p class="ltx_p">In summary, the whole adaptor-based DLC construction consists of two main building blocks.</p>
+<div id="Sx3.SS0.SSSx2.p1" class="ltx_para">
+<p class="ltx_p">In summary, the whole adaptor-based DLC construction consists of two main building blocks, visualized in <a href="#Sx3.F3" title="Figure 3 ‣ Summary ‣ Construction of DLCs ‣ Demystifying Discreet Log Contracts (DLCs)" class="ltx_ref"><span class="ltx_text ltx_ref_tag">3</span></a>:</p>
 </div>
-<div id="Sx1.SS0.SSSx3.p2" class="ltx_para">
-<ol id="Sx1.I2" class="ltx_enumerate">
-<li id="Sx1.I2.i1" class="ltx_item" style="list-style-type:none;">
+<div id="Sx3.SS0.SSSx2.p2" class="ltx_para">
+<ol id="Sx3.I3" class="ltx_enumerate">
+<li id="Sx3.I3.i1" class="ltx_item" style="list-style-type:none;">
 <span class="ltx_tag ltx_tag_item">1.</span> 
-<div id="Sx1.I2.i1.p1" class="ltx_para">
+<div id="Sx3.I3.i1.p1" class="ltx_para">
 <p class="ltx_p">Computing anticipation points and attestations.</p>
 </div>
 </li>
-<li id="Sx1.I2.i2" class="ltx_item" style="list-style-type:none;">
+<li id="Sx3.I3.i2" class="ltx_item" style="list-style-type:none;">
 <span class="ltx_tag ltx_tag_item">2.</span> 
-<div id="Sx1.I2.i2.p1" class="ltx_para">
+<div id="Sx3.I3.i2.p1" class="ltx_para">
 <p class="ltx_p">Computing pre-signatures for CETs using anticipation points as adaptor points and adapting the pre-signatures into signatures using attestations as adaptor secrets.</p>
 </div>
 </li>
 </ol>
+</div>
+<figure id="Sx3.F3" class="ltx_figure"><object type="image/svg+xml" data="anticipation_points_1.svg" id="Sx3.F3.g1" class="ltx_graphics ltx_centering" width="379" height="327" aria-label="Visualization of adaptor-based DLC construction. Solid lines correspond to actions done by Alice and Bob, and dashed lines to actions done by the oracle."><p>Visualization of adaptor-based DLC construction. Solid lines correspond to actions done by Alice and Bob, and dashed lines to actions done by the oracle.</p></object>
+<figcaption class="ltx_caption ltx_centering"><span class="ltx_tag ltx_tag_figure">Figure 3: </span>Visualization of adaptor-based DLC construction. Solid lines correspond to actions done by Alice and Bob, and dashed lines to actions done by the oracle.</figcaption>
+</figure>
+</section>
+</section>
+<section id="Sx4" class="ltx_section">
+<h2 class="ltx_title ltx_title_section">Optimizations and multiple oracles</h2>
+
+<section id="Sx4.SS0.SSSx1" class="ltx_subsubsection">
+<h3 class="ltx_title ltx_title_subsubsection">Optimization for numerical outcomes</h3>
+
+<div id="Sx4.SS0.SSSx1.p1" class="ltx_para">
+<p class="ltx_p">Recall that the computation of one anticipation point consists of one point addition and one scalar multiplication, with the scalar multiplication being the much more demanding operation.
+For events with a lot of possible outcomes, creating all the anticipation points starts to be computationally demanding.
+Fortunately, for events with numerical outcomes (like Bitcoin price on a specific date), there exists an optimization.
+Instead of working with outcome numbers directly, these numbers are first decomposed using an agreed-upon base.
+When the event occurs, the oracle then signs each digit of its numerical outcome separately.
+For this to work, instead of using one nonce value <math id="Sx4.SS0.SSSx1.p1.m1" class="ltx_Math" alttext="R" display="inline"><mi>R</mi></math> as an event’s public key, multiple nonce values <math id="Sx4.SS0.SSSx1.p1.m2" class="ltx_Math" alttext="R_{i}" display="inline"><msub><mi>R</mi><mi>i</mi></msub></math> are used, one for each possible digit.
+The whole construction works due to the linearity of adaptor points and adaptor secrets.</p>
+</div>
+</section>
+<section id="Sx4.SS0.SSSx2" class="ltx_subsubsection">
+<h3 class="ltx_title ltx_title_subsubsection">Multiple oracles</h3>
+
+<div id="Sx4.SS0.SSSx2.p1" class="ltx_para">
+<p class="ltx_p">The security and practicality of DLCs heavily depend on the trustworthiness of the oracle.
+Unfortunately, one cannot completely avoid the risk that the oracle (i) becomes unresponsive, leading to the inability to adapt any pre-signature and so to close the contract using a CET, or (ii) becomes corrupted, leading to the closure of the contract using a CET not reflecting the real outcome.
+A natural mitigation of this risk is by relying on multiple independent oracles.
+Fortunately, such construction of DLCs with multiple oracles is possible.</p>
+</div>
+<div id="Sx4.SS0.SSSx2.p2" class="ltx_para">
+<p class="ltx_p">First, we describe the case where all oracles must agree on the outcome in order to close the contract (called <math id="Sx4.SS0.SSSx2.p2.m1" class="ltx_Math" alttext="n" display="inline"><mi>n</mi></math>-of-<math id="Sx4.SS0.SSSx2.p2.m2" class="ltx_Math" alttext="n" display="inline"><mi>n</mi></math> case).
+To create a CET for a given outcome, Alice and Bob first compute the outcome’s anticipation points for each oracle.
+Then, all these particular anticipation points are added together, and the resulting sum is used as an adaptor point (called <em class="ltx_emph ltx_font_italic">aggregate adaptor point</em>) to create the pre-signature for this CET.
+Similarly, when the event occurs, Alice and Bob compute the sum of all particular attestations for the event (one for each oracle) and use it as an adaptor secret to adapt the corresponding pre-signature.
+They succeed only if all oracles attest to the same outcome.
+The whole construction works due to the linearity of adaptor points and adaptor secrets explained earlier.
+The computational complexity of the <math id="Sx4.SS0.SSSx2.p2.m3" class="ltx_Math" alttext="n" display="inline"><mi>n</mi></math>-of-<math id="Sx4.SS0.SSSx2.p2.m4" class="ltx_Math" alttext="n" display="inline"><mi>n</mi></math> multiple oracles setup is the following. The complexity of the first building block (computation of anticipation points) is linear in the number of oracles, while the complexity of the second building block (pre-signing CETs) does not increase with more oracles.
+The setup in which all oracles must agree significantly mitigates the risk of possible corruption but does not help with the potential unresponsiveness of oracles; rather the opposite, as only one unresponsive oracle leads to the inability to close the contract.</p>
+</div>
+<div id="Sx4.SS0.SSSx2.p3" class="ltx_para">
+<p class="ltx_p">In practice, only a partial agreement by the oracles may be sufficient to declare an outcome as valid and to close a contract.
+Such an approach still eliminates the single point of failure and additionally allows for few oracles to go idle or attest to wrong outcomes.
+Suppose there are three oracles <math id="Sx4.SS0.SSSx2.p3.m1" class="ltx_Math" alttext="O_{1},O_{2}" display="inline"><mrow><msub><mi>O</mi><mn>1</mn></msub><mo>,</mo><msub><mi>O</mi><mn>2</mn></msub></mrow></math> and <math id="Sx4.SS0.SSSx2.p3.m2" class="ltx_Math" alttext="O_{3}" display="inline"><msub><mi>O</mi><mn>3</mn></msub></math> and two of these oracles are required to agree to close the contract.
+Instead of creating one pre-signature for a given CET, Alice and Bob create three pre-signatures—one for each possible pair of oracles (<math id="Sx4.SS0.SSSx2.p3.m3" class="ltx_Math" alttext="O_{1}O_{2}" display="inline"><mrow><msub><mi>O</mi><mn>1</mn></msub><mo>⁢</mo><msub><mi>O</mi><mn>2</mn></msub></mrow></math>, <math id="Sx4.SS0.SSSx2.p3.m4" class="ltx_Math" alttext="O_{1}O_{3}" display="inline"><mrow><msub><mi>O</mi><mn>1</mn></msub><mo>⁢</mo><msub><mi>O</mi><mn>3</mn></msub></mrow></math> and <math id="Sx4.SS0.SSSx2.p3.m5" class="ltx_Math" alttext="O_{2}O_{3}" display="inline"><mrow><msub><mi>O</mi><mn>2</mn></msub><mo>⁢</mo><msub><mi>O</mi><mn>3</mn></msub></mrow></math>), applying the "all oracles must agree" approach explained above.
+Then, when the event occurs, say that oracles <math id="Sx4.SS0.SSSx2.p3.m6" class="ltx_Math" alttext="O_{2}" display="inline"><msub><mi>O</mi><mn>2</mn></msub></math> and <math id="Sx4.SS0.SSSx2.p3.m7" class="ltx_Math" alttext="O_{3}" display="inline"><msub><mi>O</mi><mn>3</mn></msub></math> attest to the same outcome <math id="Sx4.SS0.SSSx2.p3.m8" class="ltx_Math" alttext="o" display="inline"><mi>o</mi></math> while <math id="Sx4.SS0.SSSx2.p3.m9" class="ltx_Math" alttext="O_{1}" display="inline"><msub><mi>O</mi><mn>1</mn></msub></math> attests to a distinct one.
+Alice and Bob can then use the attestations from oracles <math id="Sx4.SS0.SSSx2.p3.m10" class="ltx_Math" alttext="O_{2}" display="inline"><msub><mi>O</mi><mn>2</mn></msub></math> and <math id="Sx4.SS0.SSSx2.p3.m11" class="ltx_Math" alttext="O_{3}" display="inline"><msub><mi>O</mi><mn>3</mn></msub></math>, sum them up to create an adaptor secret and use it to adapt the pre-signature for the outcome <math id="Sx4.SS0.SSSx2.p3.m12" class="ltx_Math" alttext="o" display="inline"><mi>o</mi></math> corresponding to the pair <math id="Sx4.SS0.SSSx2.p3.m13" class="ltx_Math" alttext="O_{2}O_{3}" display="inline"><mrow><msub><mi>O</mi><mn>2</mn></msub><mo>⁢</mo><msub><mi>O</mi><mn>3</mn></msub></mrow></math>.</p>
+</div>
+<div id="Sx4.SS0.SSSx2.p4" class="ltx_para">
+<p class="ltx_p">For the general multiple oracle setup in which at least <math id="Sx4.SS0.SSSx2.p4.m1" class="ltx_Math" alttext="t" display="inline"><mi>t</mi></math> oracles out of <math id="Sx4.SS0.SSSx2.p4.m2" class="ltx_Math" alttext="n" display="inline"><mi>n</mi></math> must agree (<math id="Sx4.SS0.SSSx2.p4.m3" class="ltx_Math" alttext="t" display="inline"><mi>t</mi></math>-of-<math id="Sx4.SS0.SSSx2.p4.m4" class="ltx_Math" alttext="n" display="inline"><mi>n</mi></math> case), the <math id="Sx4.SS0.SSSx2.p4.m5" class="ltx_Math" alttext="t" display="inline"><mi>t</mi></math>-of-<math id="Sx4.SS0.SSSx2.p4.m6" class="ltx_Math" alttext="t" display="inline"><mi>t</mi></math> case is applied to each possible combination of <math id="Sx4.SS0.SSSx2.p4.m7" class="ltx_Math" alttext="t" display="inline"><mi>t</mi></math> oracles.
+As there are <math id="Sx4.SS0.SSSx2.p4.m8" class="ltx_Math" alttext="n\choose t" display="inline"><mrow><mo>(</mo><mfrac linethickness="0pt"><mi>n</mi><mi>t</mi></mfrac><mo>)</mo></mrow></math> such combinations, the whole computational complexity of the <math id="Sx4.SS0.SSSx2.p4.m9" class="ltx_Math" alttext="t" display="inline"><mi>t</mi></math>-of-<math id="Sx4.SS0.SSSx2.p4.m10" class="ltx_Math" alttext="n" display="inline"><mi>n</mi></math> setup is <math id="Sx4.SS0.SSSx2.p4.m11" class="ltx_Math" alttext="n\choose t" display="inline"><mrow><mo>(</mo><mfrac linethickness="0pt"><mi>n</mi><mi>t</mi></mfrac><mo>)</mo></mrow></math> times the complexity of the <math id="Sx4.SS0.SSSx2.p4.m12" class="ltx_Math" alttext="t" display="inline"><mi>t</mi></math>-of-<math id="Sx4.SS0.SSSx2.p4.m13" class="ltx_Math" alttext="t" display="inline"><mi>t</mi></math> setup.</p>
+</div>
+</section>
+</section>
+<section id="Sx5" class="ltx_section">
+<h2 class="ltx_title ltx_title_section">Schnorr signatures</h2>
+
+<section id="Sx5.SS0.SSSx1" class="ltx_subsubsection">
+<h3 class="ltx_title ltx_title_subsubsection">Schnorr signature scheme</h3>
+
+<div id="Sx5.SS0.SSSx1.p1" class="ltx_para">
+<p class="ltx_p">Before showing how to construct adaptor signatures for the Schnorr signature scheme, the standard Schnorr signature scheme is recalled first in <a href="#Sx5.F4" title="Figure 4 ‣ Schnorr signature scheme ‣ Schnorr signatures ‣ Demystifying Discreet Log Contracts (DLCs)" class="ltx_ref"><span class="ltx_text ltx_ref_tag">4</span></a>, where <math id="Sx5.SS0.SSSx1.p1.m1" class="ltx_Math" alttext="\mathsf{H}" display="inline"><mi>𝖧</mi></math> is a hash function.
+It consists of three algorithms <math id="Sx5.SS0.SSSx1.p1.m2" class="ltx_Math" alttext="\mathsf{KeyGen}" display="inline"><mi>𝖪𝖾𝗒𝖦𝖾𝗇</mi></math>, <math id="Sx5.SS0.SSSx1.p1.m3" class="ltx_Math" alttext="\mathsf{Sign}" display="inline"><mi>𝖲𝗂𝗀𝗇</mi></math> and <math id="Sx5.SS0.SSSx1.p1.m4" class="ltx_Math" alttext="\mathsf{Vrfy}" display="inline"><mi>𝖵𝗋𝖿𝗒</mi></math>.
+<math id="Sx5.SS0.SSSx1.p1.m5" class="ltx_Math" alttext="\mathsf{KeyGen}" display="inline"><mi>𝖪𝖾𝗒𝖦𝖾𝗇</mi></math> is a key generation algorithm.
+<math id="Sx5.SS0.SSSx1.p1.m6" class="ltx_Math" alttext="\mathsf{Sign}" display="inline"><mi>𝖲𝗂𝗀𝗇</mi></math> is the signing algorithm that takes as input a message <math id="Sx5.SS0.SSSx1.p1.m7" class="ltx_Math" alttext="m" display="inline"><mi>m</mi></math> and a secret key <math id="Sx5.SS0.SSSx1.p1.m8" class="ltx_Math" alttext="\mathsf{sk}" display="inline"><mi>𝗌𝗄</mi></math>, and outputs a signature <math id="Sx5.SS0.SSSx1.p1.m9" class="ltx_Math" alttext="\sigma" display="inline"><mi>σ</mi></math>.
+<math id="Sx5.SS0.SSSx1.p1.m10" class="ltx_Math" alttext="\mathsf{Vrfy}" display="inline"><mi>𝖵𝗋𝖿𝗒</mi></math> is the verification algorithm that takes as input a message <math id="Sx5.SS0.SSSx1.p1.m11" class="ltx_Math" alttext="m" display="inline"><mi>m</mi></math>, a signature <math id="Sx5.SS0.SSSx1.p1.m12" class="ltx_Math" alttext="\sigma" display="inline"><mi>σ</mi></math> and a public key <math id="Sx5.SS0.SSSx1.p1.m13" class="ltx_Math" alttext="\mathsf{pk}" display="inline"><mi>𝗉𝗄</mi></math>, and verifies whether <math id="Sx5.SS0.SSSx1.p1.m14" class="ltx_Math" alttext="\sigma" display="inline"><mi>σ</mi></math> is a valid signature on <math id="Sx5.SS0.SSSx1.p1.m15" class="ltx_Math" alttext="m" display="inline"><mi>m</mi></math> under <math id="Sx5.SS0.SSSx1.p1.m16" class="ltx_Math" alttext="\mathsf{pk}" display="inline"><mi>𝗉𝗄</mi></math>.
+We would like to emphasize that the same randomness <math id="Sx5.SS0.SSSx1.p1.m17" class="ltx_Math" alttext="k" display="inline"><mi>k</mi></math> cannot be reused for signing two different messages, as it would lead to the compromise of the secret key (two linear equations of two unknowns).</p>
+</div>
+<figure id="Sx5.F4" class="ltx_figure"><object type="image/svg+xml" data="schnorr.svg" id="Sx5.F4.g1" class="ltx_graphics ltx_centering" width="513" height="170" aria-label="Schnorr signature scheme."><p>Schnorr signature scheme.</p></object>
+<figcaption class="ltx_caption ltx_centering"><span class="ltx_tag ltx_tag_figure">Figure 4: </span>Schnorr signature scheme.</figcaption>
+</figure>
+</section>
+<section id="Sx5.SS0.SSSx2" class="ltx_subsubsection">
+<h3 class="ltx_title ltx_title_subsubsection">Schnorr adaptor signature scheme</h3>
+
+<div id="Sx5.SS0.SSSx2.p1" class="ltx_para">
+<p class="ltx_p">Now, we describe how to construct adaptor signatures for the Schnorr signature scheme. The full construction is shown in <a href="#Sx5.F5" title="Figure 5 ‣ Schnorr adaptor signature scheme ‣ Schnorr signatures ‣ Demystifying Discreet Log Contracts (DLCs)" class="ltx_ref"><span class="ltx_text ltx_ref_tag">5</span></a>.</p>
+</div>
+<div id="Sx5.SS0.SSSx2.p2" class="ltx_para">
+<ul id="Sx5.I4" class="ltx_itemize">
+<li id="Sx5.I4.i1" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">•</span> 
+<div id="Sx5.I4.i1.p1" class="ltx_para">
+<p class="ltx_p"><math id="Sx5.I4.i1.p1.m1" class="ltx_Math" alttext="\mathsf{pSign}" display="inline"><mi>𝗉𝖲𝗂𝗀𝗇</mi></math> creates pre-signatures using the adaptor point <math id="Sx5.I4.i1.p1.m2" class="ltx_Math" alttext="Y" display="inline"><mi>Y</mi></math>.</p>
+</div>
+</li>
+<li id="Sx5.I4.i2" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">•</span> 
+<div id="Sx5.I4.i2.p1" class="ltx_para">
+<p class="ltx_p"><math id="Sx5.I4.i2.p1.m1" class="ltx_Math" alttext="\mathsf{pVrfy}" display="inline"><mi>𝗉𝖵𝗋𝖿𝗒</mi></math> verifies whether a pre-signature can be transformed into a valid signature once the adaptor secret is revealed.</p>
+</div>
+</li>
+<li id="Sx5.I4.i3" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">•</span> 
+<div id="Sx5.I4.i3.p1" class="ltx_para">
+<p class="ltx_p"><math id="Sx5.I4.i3.p1.m1" class="ltx_Math" alttext="\mathsf{Adapt}" display="inline"><mi>𝖠𝖽𝖺𝗉𝗍</mi></math> transforms a pre-signature into a valid signature using the adaptor secret <math id="Sx5.I4.i3.p1.m2" class="ltx_Math" alttext="y" display="inline"><mi>y</mi></math>.</p>
+</div>
+</li>
+</ul>
+</div>
+<div id="Sx5.SS0.SSSx2.p3" class="ltx_para">
+<p class="ltx_p">The computation of a pre-signature to a large extent resembles the computation of a standard signature.
+The only difference is that in the computation of <math id="Sx5.SS0.SSSx2.p3.m1" class="ltx_Math" alttext="e" display="inline"><mi>e</mi></math>, the point <math id="Sx5.SS0.SSSx2.p3.m2" class="ltx_Math" alttext="kG" display="inline"><mrow><mi>k</mi><mo>⁢</mo><mi>G</mi></mrow></math> is shifted by the adaptor point <math id="Sx5.SS0.SSSx2.p3.m3" class="ltx_Math" alttext="Y" display="inline"><mi>Y</mi></math>.
+As a result, the randomness under <math id="Sx5.SS0.SSSx2.p3.m4" class="ltx_Math" alttext="e" display="inline"><mi>e</mi></math> is in fact <math id="Sx5.SS0.SSSx2.p3.m5" class="ltx_Math" alttext="k+y" display="inline"><mrow><mi>k</mi><mo>+</mo><mi>y</mi></mrow></math> while <math id="Sx5.SS0.SSSx2.p3.m6" class="ltx_Math" alttext="\widetilde{s}" display="inline"><mover accent="true"><mi>s</mi><mo>~</mo></mover></math> is computed using the original randomness <math id="Sx5.SS0.SSSx2.p3.m7" class="ltx_Math" alttext="k" display="inline"><mi>k</mi></math>.
+Hence, in order to adapt the pre-signature <math id="Sx5.SS0.SSSx2.p3.m8" class="ltx_Math" alttext="(\tilde{s},e)" display="inline"><mrow><mo stretchy="false">(</mo><mover accent="true"><mi>s</mi><mo stretchy="false">~</mo></mover><mo>,</mo><mi>e</mi><mo stretchy="false">)</mo></mrow></math> into a valid signature, <math id="Sx5.SS0.SSSx2.p3.m9" class="ltx_Math" alttext="\tilde{s}" display="inline"><mover accent="true"><mi>s</mi><mo stretchy="false">~</mo></mover></math> must be shifted by the adaptor secret <math id="Sx5.SS0.SSSx2.p3.m10" class="ltx_Math" alttext="y" display="inline"><mi>y</mi></math>.</p>
+</div>
+<figure id="Sx5.F5" class="ltx_figure"><object type="image/svg+xml" data="adapt_schnorr.svg" id="Sx5.F5.g1" class="ltx_graphics ltx_centering" width="557" height="177" aria-label="Schnorr adaptor signature scheme."><p>Schnorr adaptor signature scheme.</p></object>
+<figcaption class="ltx_caption ltx_centering"><span class="ltx_tag ltx_tag_figure">Figure 5: </span>Schnorr adaptor signature scheme.</figcaption>
+</figure>
+</section>
+<section id="Sx5.SS0.SSSx3" class="ltx_subsubsection">
+<h3 class="ltx_title ltx_title_subsubsection">Attestation as a Schnorr signature</h3>
+
+<div id="Sx5.SS0.SSSx3.p1" class="ltx_para">
+<p class="ltx_p">Notice that the attestation <math id="Sx5.SS0.SSSx3.p1.m1" class="ltx_Math" alttext="t_{o^{*}}" display="inline"><msub><mi>t</mi><msup><mi>o</mi><mo>*</mo></msup></msub></math> is basically a standard Schnorr signature of the outcome <math id="Sx5.SS0.SSSx3.p1.m2" class="ltx_Math" alttext="o^{*}" display="inline"><msup><mi>o</mi><mo>*</mo></msup></math>, using the event’s secret key <math id="Sx5.SS0.SSSx3.p1.m3" class="ltx_Math" alttext="r" display="inline"><mi>r</mi></math> as the randomness.
+That also explains why an anticipation point is sometimes called a signature point.
+The trick is that by committing to and publishing the point <math id="Sx5.SS0.SSSx3.p1.m4" class="ltx_Math" alttext="R" display="inline"><mi>R</mi></math> as part of the oracle announcement, signature points can be computed with only public information and prior to the creation of actual signatures.</p>
+</div>
+<div id="Sx5.SS0.SSSx3.p2" class="ltx_para">
+<p class="ltx_p">Nevertheless, the main purpose of anticipation points and attestations is to be able to compute elliptic curve points (anticipation points) from the oracle’s public information such that the oracle is able to provide discrete logarithms for these points (attestations).</p>
+</div>
+<div id="Sx5.SS0.SSSx3.p3" class="ltx_para">
+<p class="ltx_p">We would like to emphasize that such functionality could be achieved via other constructions, for example, using the non-hardened derivation from BIP 32.
+However, the construction using Schnorr signatures has the nice side effect that the attestation is actually a signature of the outcome.</p>
+</div>
+</section>
+<section id="Sx5.SS0.SSSx4" class="ltx_subsubsection">
+<h3 class="ltx_title ltx_title_subsubsection">Randomness reuse and DLCs</h3>
+
+<div id="Sx5.SS0.SSSx4.p1" class="ltx_para">
+<p class="ltx_p">We have shown that attestation is basically a standard Schnorr signature of the outcome, and we know that the same randomness cannot be used to sign two different messages, as it would lead to the compromise of the secret key.
+In DLC construction, a side effect of this property is that it serves as a security measure against a malicious oracle (the accountability property mentioned in the introduction).
+If a malicious oracle should try to cheat by attesting to two outcomes for one event, the oracle’s secret key could be computed from the two attestations (signatures), leading to the complete compromise of the oracle, as its secret key is reused across all its events.</p>
 </div>
 </section>
 </section>
@@ -156,6 +413,19 @@ When the event occurs with the actual outcome <math id="Sx1.SS0.SSSx2.p5.m2" cla
 <h2 class="ltx_title ltx_title_bibliography">References</h2>
 
 <ul id="bib.L1" class="ltx_biblist">
+<li id="bib.bib1" class="ltx_bibitem ltx_bib_inproceedings">
+<span class="ltx_tag ltx_bib_abbrv ltx_role_refnum ltx_tag_bibitem">[BGL+03]</span>
+<span class="ltx_bibblock"><span class="ltx_text ltx_bib_author">D. Boneh, C. Gentry, B. Lynn, and H. Shacham</span><span class="ltx_text ltx_bib_year"> (2003)</span>
+</span>
+<span class="ltx_bibblock"><span class="ltx_text ltx_bib_title">Aggregate and verifiably encrypted signatures from bilinear maps</span>.
+</span>
+<span class="ltx_bibblock">In <span class="ltx_text ltx_bib_inbook">International conference on the theory and applications of cryptographic techniques</span>,
+</span>
+<span class="ltx_bibblock"><span class="ltx_text ltx_bib_pages"> pp. 416–432</span>.
+</span>
+<span class="ltx_bibblock ltx_bib_cited">Cited by: <a href="#Sx2.p1" title="Adaptor signatures ‣ Demystifying Discreet Log Contracts (DLCs)" class="ltx_ref"><span class="ltx_text ltx_ref_title">Adaptor signatures</span></a>.
+</span>
+</li>
 <li id="bib.bib7" class="ltx_bibitem ltx_bib_misc">
 <span class="ltx_tag ltx_bib_abbrv ltx_role_refnum ltx_tag_bibitem">[DRY17]</span>
 <span class="ltx_bibblock"><span class="ltx_text ltx_bib_author">T. Dryja</span><span class="ltx_text ltx_bib_year"> (2017)</span>
@@ -167,13 +437,67 @@ When the event occurs with the actual outcome <math id="Sx1.SS0.SSSx2.p5.m2" cla
 <span class="ltx_bibblock ltx_bib_cited">Cited by: <a href="#Sx1.p1" title="Introduction ‣ Demystifying Discreet Log Contracts (DLCs)" class="ltx_ref"><span class="ltx_text ltx_ref_title">Introduction</span></a>.
 </span>
 </li>
+<li id="bib.bib6" class="ltx_bibitem ltx_bib_misc">
+<span class="ltx_tag ltx_bib_abbrv ltx_role_refnum ltx_tag_bibitem">[FOU19]</span>
+<span class="ltx_bibblock"><span class="ltx_text ltx_bib_author">L. Fournier</span><span class="ltx_text ltx_bib_year"> (2019)</span>
+</span>
+<span class="ltx_bibblock"><span class="ltx_text ltx_bib_title">One-time verifiably encrypted signatures a.k.a. adaptor signatures</span>.
+</span>
+<span class="ltx_bibblock">External Links: <span class="ltx_text ltx_bib_links"><a href="https://github.com/LLFourn/one-time-VES/blob/master/main.pdf" title="" class="ltx_ref ltx_bib_external">Link</a></span>
+</span>
+<span class="ltx_bibblock ltx_bib_cited">Cited by: <a href="#Sx1.SS0.SSSx3.p2" title="Evolution of DLCs ‣ Introduction ‣ Demystifying Discreet Log Contracts (DLCs)" class="ltx_ref"><span class="ltx_text ltx_ref_title">Evolution of DLCs</span></a>.
+</span>
+</li>
+<li id="bib.bib5" class="ltx_bibitem ltx_bib_inproceedings">
+<span class="ltx_tag ltx_bib_abbrv ltx_role_refnum ltx_tag_bibitem">[GKK22]</span>
+<span class="ltx_bibblock"><span class="ltx_text ltx_bib_author">T. L. Guilly, N. Kohen, and I. Kuwahara</span><span class="ltx_text ltx_bib_year"> (2022)</span>
+</span>
+<span class="ltx_bibblock"><span class="ltx_text ltx_bib_title">Bitcoin oracle contracts: discreet log contracts in practice</span>.
+</span>
+<span class="ltx_bibblock">In <span class="ltx_text ltx_bib_inbook">IEEE International Conference on Blockchain and Cryptocurrency,
+ICBC 2022, Shanghai, China, May 2-5, 2022</span>,
+</span>
+<span class="ltx_bibblock"><span class="ltx_text ltx_bib_pages"> pp. 1–8</span>.
+</span>
+<span class="ltx_bibblock">External Links: <span class="ltx_text ltx_bib_links"><a href="https://doi.org/10.1109/ICBC54727.2022.9805512" title="" class="ltx_ref ltx_bib_external">Link</a>,
+<a href="https://dx.doi.org/10.1109/ICBC54727.2022.9805512" title="" class="ltx_ref doi ltx_bib_external">Document</a></span>
+</span>
+<span class="ltx_bibblock ltx_bib_cited">Cited by: <a href="#Sx1.SS0.SSSx3.p2" title="Evolution of DLCs ‣ Introduction ‣ Demystifying Discreet Log Contracts (DLCs)" class="ltx_ref"><span class="ltx_text ltx_ref_title">Evolution of DLCs</span></a>.
+</span>
+</li>
+<li id="bib.bib2" class="ltx_bibitem ltx_bib_misc">
+<span class="ltx_tag ltx_bib_key ltx_role_refnum ltx_tag_bibitem">[5]</span>
+<span class="ltx_bibblock"><span class="ltx_text ltx_bib_title">Rust-dlc</span>.
+</span>
+<span class="ltx_bibblock">Note: <span class="ltx_text ltx_bib_note"><a href="https://github.com/p2pderivatives/rust-dlc" title="" class="ltx_ref ltx_url ltx_font_typewriter">https://github.com/p2pderivatives/rust-dlc</a>&nbsp;&nbsp;Accessed: 2025-12-10</span>
+</span>
+<span class="ltx_bibblock ltx_bib_cited">Cited by: <a href="#Sx1.SS0.SSSx3.p2" title="Evolution of DLCs ‣ Introduction ‣ Demystifying Discreet Log Contracts (DLCs)" class="ltx_ref"><span class="ltx_text ltx_ref_title">Evolution of DLCs</span></a>.
+</span>
+</li>
+<li id="bib.bib4" class="ltx_bibitem ltx_bib_misc">
+<span class="ltx_tag ltx_bib_abbrv ltx_role_refnum ltx_tag_bibitem">[POE17]</span>
+<span class="ltx_bibblock"><span class="ltx_text ltx_bib_author">A. Poelstra</span><span class="ltx_text ltx_bib_year"> (2017)</span>
+</span>
+<span class="ltx_bibblock"><span class="ltx_text ltx_bib_title">Scriptless scripts</span>.
+</span>
+<span class="ltx_bibblock">External Links: <span class="ltx_text ltx_bib_links"><a href="https://download.wpsoftware.net/bitcoin/wizardry/%0Amw-slides/2017-03-mit-bitcoin-expo/slides.pdf" title="" class="ltx_ref ltx_bib_external">Link</a></span>
+</span>
+<span class="ltx_bibblock ltx_bib_cited">Cited by: <a href="#Sx2.p1" title="Adaptor signatures ‣ Demystifying Discreet Log Contracts (DLCs)" class="ltx_ref"><span class="ltx_text ltx_ref_title">Adaptor signatures</span></a>.
+</span>
+</li>
+<li id="bib.bib3" class="ltx_bibitem ltx_bib_misc">
+<span class="ltx_tag ltx_bib_key ltx_role_refnum ltx_tag_bibitem">[7]</span>
+<span class="ltx_bibblock"><span class="ltx_text ltx_bib_title">Dlc-specs</span>.
+</span>
+<span class="ltx_bibblock">Note: <span class="ltx_text ltx_bib_note"><a href="https://github.com/discreetlogcontracts/dlcspecs" title="" class="ltx_ref ltx_url ltx_font_typewriter">https://github.com/discreetlogcontracts/dlcspecs</a>&nbsp;&nbsp;Accessed: 2025-12-10</span>
+</span>
+<span class="ltx_bibblock ltx_bib_cited">Cited by: <a href="#Sx1.SS0.SSSx3.p2" title="Evolution of DLCs ‣ Introduction ‣ Demystifying Discreet Log Contracts (DLCs)" class="ltx_ref"><span class="ltx_text ltx_ref_title">Evolution of DLCs</span></a>.
+</span>
+</li>
 </ul>
 </section>
 </article>
 </div>
-<footer class="ltx_page_footer">
-<div class="ltx_page_logo">Generated  on Sat Mar  7 13:35:20 2026 by <a href="http://dlmf.nist.gov/LaTeXML/">LaTeXML <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAsAAAAOCAYAAAD5YeaVAAAAAXNSR0IArs4c6QAAAAZiS0dEAP8A/wD/oL2nkwAAAAlwSFlzAAALEwAACxMBAJqcGAAAAAd0SU1FB9wKExQZLWTEaOUAAAAddEVYdENvbW1lbnQAQ3JlYXRlZCB3aXRoIFRoZSBHSU1Q72QlbgAAAdpJREFUKM9tkL+L2nAARz9fPZNCKFapUn8kyI0e4iRHSR1Kb8ng0lJw6FYHFwv2LwhOpcWxTjeUunYqOmqd6hEoRDhtDWdA8ApRYsSUCDHNt5ul13vz4w0vWCgUnnEc975arX6ORqN3VqtVZbfbTQC4uEHANM3jSqXymFI6yWazP2KxWAXAL9zCUa1Wy2tXVxheKA9YNoR8Pt+aTqe4FVVVvz05O6MBhqUIBGk8Hn8HAOVy+T+XLJfLS4ZhTiRJgqIoVBRFIoric47jPnmeB1mW/9rr9ZpSSn3Lsmir1fJZlqWlUonKsvwWwD8ymc/nXwVBeLjf7xEKhdBut9Hr9WgmkyGEkJwsy5eHG5vN5g0AKIoCAEgkEkin0wQAfN9/cXPdheu6P33fBwB4ngcAcByHJpPJl+fn54mD3Gg0NrquXxeLRQAAwzAYj8cwTZPwPH9/sVg8PXweDAauqqr2cDjEer1GJBLBZDJBs9mE4zjwfZ85lAGg2+06hmGgXq+j3+/DsixYlgVN03a9Xu8jgCNCyIegIAgx13Vfd7vdu+FweG8YRkjXdWy329+dTgeSJD3ieZ7RNO0VAXAPwDEAO5VKndi2fWrb9jWl9Esul6PZbDY9Go1OZ7PZ9z/lyuD3OozU2wAAAABJRU5ErkJggg==" alt="[LOGO]"></a>
-</div></footer>
 </div>
 </body>
 </html>
