@@ -146,6 +146,7 @@ section > .ltx_title + .ltx_date + .ltx_para > .ltx_p,
 .ltx_graphics {
     max-width: 100%;
     height: auto;
+    background-color: white; /* Ensure visibility in dark mode */
 }
 
 /* Bibliography */
