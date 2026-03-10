@@ -255,9 +255,12 @@ section > .ltx_title + .ltx_date + .ltx_para > .ltx_p,
 
 /* Enlarge CETs figure specifically */
 #Sx1\.F1 .ltx_graphics {
-    width: 500px !important; /* Back to original size */
+    width: 500px !important; 
     height: auto;
-    padding-top: 20px; /* Add space at top to prevent clipping */
+}
+
+#Sx2\.F2 .ltx_graphics {
+    padding-top: 20px;
 }
 
 #Sx3\.F3 .ltx_graphics {
