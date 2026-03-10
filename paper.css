@@ -1,0 +1,289 @@
+
+/* Paper-like layout for LaTeXML documents */
+
+body {
+    background-color: #fdfdfd;
+    color: #000000; /* Pure black for maximum contrast across browsers */
+    font-family: "Latin Modern Roman", "Charter", "Georgia", "Liberation Serif", "Times New Roman", Times, serif;
+    font-size: 12pt;
+    line-height: 1.5;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+}
+
+.ltx_page_main {
+    background-color: white;
+    width: 216mm; /* Letter width */
+    max-width: 100%;
+    min-height: 279mm;
+    padding: 35mm 30mm;
+    margin: 40px auto; /* Centered with vertical space */
+    box-sizing: border-box;
+    box-shadow: 0 0 20px rgba(0,0,0,0.1);
+    position: relative;
+}
+
+/* Neutralize intrusive defaults from baseline CSS */
+.ltx_page_content {
+    clear: none !important; /* Fix potential layout breaking */
+}
+
+.ltx_title {
+    border: none !important; /* Remove any default underlines */
+}
+
+/* Typography */
+.ltx_p, .ltx_para {
+    text-align: justify;
+    hyphens: auto;
+    margin-top: 0;
+    margin-bottom: 0;
+}
+
+/* Indentation: indent all p except the first one in its context, or specifically for ltx_p */
+.ltx_p {
+    text-indent: 0;
+}
+
+/* Standard LaTeX: first paragraph of a section is NOT indented.
+   Subsequent paragraphs ARE indented. */
+.ltx_p + .ltx_p,
+.ltx_para + .ltx_para .ltx_p {
+    text-indent: 1.5em;
+}
+
+/* Reset indentation for specific cases */
+section > .ltx_title + .ltx_para > .ltx_p,
+section > .ltx_title + .ltx_date + .ltx_para > .ltx_p,
+.ltx_title_abstract + .ltx_p,
+.ltx_title_section + .ltx_p,
+.ltx_title_subsection + .ltx_p {
+    text-indent: 0 !important;
+}
+
+/* Equations */
+.ltx_equation {
+    margin: 1.5em 0;
+    overflow-x: auto;
+}
+
+.ltx_eqn_row {
+    vertical-align: middle !important;
+}
+
+.ltx_eqn_cell {
+    padding: 0.5em 0;
+    vertical-align: middle !important;
+}
+
+.ltx_eqn_eqno {
+    vertical-align: middle !important;
+    line-height: 1 !important; /* Prevent line-height from pushing it down */
+}
+
+.ltx_tag_equation {
+    font-family: serif;
+    font-size: 0.9em;
+    display: inline-block;
+    vertical-align: middle;
+}
+
+/* Titles */
+.ltx_title_document {
+    font-size: 1.8em;
+    font-weight: bold;
+    margin-bottom: 1em;
+}
+
+.ltx_authors {
+    margin-bottom: 2em;
+    font-size: 1.1em;
+}
+
+.ltx_title_section {
+    font-size: 1.4em;
+    margin-top: 2em;
+    margin-bottom: 0.8em;
+    border: none;
+}
+
+.ltx_title_subsection {
+    font-size: 1.2em;
+    margin-top: 1.5em;
+    margin-bottom: 0.6em;
+}
+
+/* Abstract */
+.ltx_abstract {
+    margin: 2em 3em;
+    font-size: 0.95em;
+}
+
+.ltx_title_abstract {
+    font-weight: bold;
+    font-size: 1em;
+    margin-bottom: 0.5em;
+    text-align: center;
+}
+
+/* Figures and Captions */
+.ltx_figure {
+    margin: 2em auto;
+}
+
+.ltx_caption {
+    font-size: 0.9em;
+    margin-top: 0.5em;
+    color: #444;
+}
+
+.ltx_tag_figure {
+    font-weight: bold;
+}
+
+.ltx_graphics {
+    max-width: 100%;
+    height: auto;
+}
+
+/* Bibliography */
+.ltx_bibliography {
+    margin-top: 3em;
+    border-top: 1px solid #eee;
+    padding-top: 1em;
+}
+
+.ltx_biblist {
+    list-style: none;
+    padding-left: 0;
+}
+
+.ltx_bibitem {
+    margin-bottom: 1.5em;
+    font-size: 0.9em;
+    clear: both;
+}
+
+.ltx_bib_abbrv {
+    font-weight: bold;
+    display: inline-block;
+    width: 5.5em; /* Fixed width to prevent overlap */
+    margin-right: 0.5em;
+    vertical-align: top;
+}
+
+.ltx_bibblock {
+    display: inline; /* Keep as inline to follow the tag */
+}
+
+/* Lists */
+/* Description Lists (Scalability, Privacy, DLC Lifecycle, etc.) */
+.ltx_description {
+    margin: 1.5em 0;
+    overflow: hidden; /* Clear floats */
+}
+
+.ltx_description dt {
+    float: left;
+    clear: left;
+    font-weight: bold;
+    margin-right: 0.5em;
+    min-width: 8em; /* Optional: sets a minimum width for the labels to align the text block */
+}
+
+.ltx_description dd {
+    display: block;
+    overflow: hidden; /* Creates a new block formatting context to align all lines */
+    margin-bottom: 1.2em;
+    margin-left: 0; /* Reset default margin */
+}
+
+/* Ensure internal elements stay together in the block */
+.ltx_description dd .ltx_para,
+.ltx_description dd .ltx_p {
+    display: inline;
+    text-indent: 0 !important;
+}
+
+/* Specific fix for the Why DLCs list if needed */
+#Sx1\.I1 dt {
+    min-width: 8em;
+}
+
+#Sx1\.I1 dd {
+    overflow: hidden;
+}
+
+/* Ensure DLCs lifecycle list items take full width now that they have no labels */
+#Sx1\.I2 dt {
+    display: none;
+}
+
+#Sx1\.I2 dd {
+    margin-left: 0;
+    overflow: visible;
+    padding-left: 2em; /* Indent all lines */
+    text-indent: -2em; /* Pull first line back by the same amount to reach full width */
+    display: block;
+}
+
+/* Ensure paragraph inside dd doesn't mess with the indentation */
+#Sx1\.I2 dd .ltx_p {
+    display: inline;
+    text-indent: 0;
+}
+
+#Sx1\.SS0\.SSSx2\.p3 {
+    margin-top: -0.5em; /* Reduce the large gap after the list */
+}
+
+/* Enlarge CETs figure specifically */
+#Sx1\.F1 .ltx_graphics {
+    width: 500px !important; /* Slightly smaller than before */
+    height: auto;
+}
+
+#Sx3\.F3 .ltx_graphics {
+    width: 450px !important;
+    height: auto;
+}
+
+#Sx5\.F4 .ltx_graphics {
+    width: 100% !important;
+    height: auto;
+}
+
+#Sx5\.F5 .ltx_graphics {
+    width: 100% !important;
+    height: auto;
+}
+
+/* Final cleanup for the description list headers */
+.ltx_description dt {
+    font-family: inherit;
+    font-size: 1em;
+}
+
+.ltx_item .ltx_tag {
+    font-weight: bold;
+    margin-right: 0.5em;
+}
+
+/* Links */
+a {
+    color: #004a99;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+/* Responsive adjustments */
+@media screen and (max-width: 210mm) {
+    .ltx_page_main {
+        padding: 2em 1.5em;
+    }
+}
