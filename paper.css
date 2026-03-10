@@ -23,6 +23,7 @@ body {
     box-sizing: border-box;
     box-shadow: 0 0 20px rgba(0,0,0,0.1);
     position: relative;
+    overflow: visible; /* Ensure content like SVGs aren't clipped */
 }
 
 /* Neutralize intrusive defaults from baseline CSS */
