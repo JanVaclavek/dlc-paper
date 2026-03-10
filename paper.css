@@ -255,8 +255,11 @@ section > .ltx_title + .ltx_date + .ltx_para > .ltx_p,
 
 /* Enlarge CETs figure specifically */
 #Sx1\.F1 .ltx_graphics {
-    width: 500px !important; /* Slightly smaller than before */
-    height: auto;
+    width: 600px !important; 
+    max-width: none;
+    display: block;
+    margin: 0 auto;
+    min-height: 730px; /* Force height to prevent clipping in Firefox */
 }
 
 #Sx3\.F3 .ltx_graphics {
